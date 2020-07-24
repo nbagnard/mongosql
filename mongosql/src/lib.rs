@@ -1,5 +1,15 @@
 
 pub fn translate_sql(sql: &str) -> String {
-	let pipeline = format!(r#"[{{"$sql": {{"statement": "{}", "format": "odbc"}}}}]"#, sql);
-	pipeline
+	let bson = translate_sql_to_bson(sql);
+	serde_json::to_string(&bson).unwrap()
+}
+
+fn translate_sql_to_bson(sql: &str) -> bson::Bson {
+	bson::bson!([
+		{"$sql": {
+			"statement": sql,
+			"format": "odbc",
+			"formatVersion": 1,
+		}},
+	])
 }
