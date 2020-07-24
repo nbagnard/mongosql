@@ -1,7 +1,7 @@
 package main
 
 /*
-#cgo LDFLAGS: -L../../target/debug/ -lmongosql -ldl
+#cgo LDFLAGS: -L../../target/x86_64-unknown-linux-musl/debug/ -lmongosql -ldl
 #include "./mongosql.h"
 */
 import "C"

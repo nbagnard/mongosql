@@ -1,6 +1,6 @@
 
 rust:
-	cargo build
+	cargo build --target x86_64-unknown-linux-musl
 
 golang:
 	cd go/mongosql && go build .
