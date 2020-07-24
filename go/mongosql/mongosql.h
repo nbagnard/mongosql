@@ -1,1 +1,1 @@
-void translate(char *sql);
+char* translate(char *sql);
