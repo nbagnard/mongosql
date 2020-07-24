@@ -1,7 +1,7 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+use std::ffi::CStr;
+
+pub extern "C" fn translate(sql: *const libc::c_char) {
+	let sql = unsafe { CStr::from_ptr(sql).to_bytes() };
+	let sql = String::from_utf8(sql.to_vec()).unwrap();
+	println!("Got SQL Query: {}", sql);
 }
