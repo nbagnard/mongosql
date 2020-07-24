@@ -2,4 +2,5 @@
 
 members = [
   "mongosql-c",
+  "mongosql",
 ]

@@ -4,7 +4,7 @@ use std::{ffi::{CString, CStr}, os::raw};
 pub extern "C" fn translate(sql: *const libc::c_char) -> *const raw::c_char {
 	let sql = unsafe { CStr::from_ptr(sql).to_bytes() };
 	let sql = String::from_utf8(sql.to_vec()).unwrap();
-	let pipeline = format!(r#"[{{"$sql": {{"statement": "{}"}}]"#, sql);
+	let pipeline = mongosql::translate_sql(&sql);
 	extern_string(&pipeline)
 }
 
