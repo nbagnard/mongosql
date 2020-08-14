@@ -1,6 +1,11 @@
 use std::{ffi::{CString, CStr}, os::raw};
 
 #[no_mangle]
+pub extern "C" fn version() -> *const raw::c_char {
+	extern_string("0.1.0-pre-test")
+}
+
+#[no_mangle]
 pub extern "C" fn translate(sql: *const libc::c_char) -> *const raw::c_char {
 	let sql = unsafe { CStr::from_ptr(sql).to_bytes() };
 	let sql = String::from_utf8(sql.to_vec()).unwrap();

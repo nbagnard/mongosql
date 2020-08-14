@@ -10,6 +10,14 @@ import (
 	"unsafe"
 )
 
+// Version returns the version of the underlying translation library. This version should match the version of the
+func Version() string {
+	cVersion := C.version()
+	version := C.GoString(cVersion)
+	C.free(unsafe.Pointer(cVersion))
+	return version
+}
+
 // Translate takes a SQL string and returns an extJSON string
 // representation of its agg-pipeline translation.
 func Translate(sql string) string {
