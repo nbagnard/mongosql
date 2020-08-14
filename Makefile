@@ -3,12 +3,12 @@ rust:
 	cargo build
 
 golang:
-	cd go/mongosql && go build .
+	cd go && go build -o mongosqlrun .
 
 build: rust golang
 
 run: build
-	./go/mongosql/mongosql
+	./go/mongosqlrun
 
 clean:
 	rm -f go/mongosql/mongosql; rm -rf target/
