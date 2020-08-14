@@ -1,7 +1,12 @@
 package main
 
-import "github.com/rychipman/mongosql-rs-example/mongosql"
+import (
+	"fmt"
+
+	"github.com/rychipman/mongosql-rs-example/mongosql"
+)
 
 func main() {
-	mongosql.Translate()
+	tr := mongosql.Translate("select * from foo join bar")
+	fmt.Printf("got translation: %s\n", tr)
 }
