@@ -23,3 +23,9 @@ func Translate(sql string) string {
 
 	return translation
 }
+
+// ResultSetSchema takes a SQL string and returns a string
+// representation of the MongoDB schema of the result set.
+func ResultSetSchema(sql string) string {
+	panic("unimplemented")
+}
