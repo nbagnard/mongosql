@@ -1,3 +1,3 @@
-module github.com/rychipman/mongosql-rs-example
+module github.com/10gen/mongosql-rs
 
 go 1.14

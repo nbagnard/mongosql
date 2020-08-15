@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/rychipman/mongosql-rs-example/mongosql"
+	"github.com/10gen/mongosql-rs/mongosql"
 )
 
 func main() {
