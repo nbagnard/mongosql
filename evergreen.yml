@@ -23,7 +23,7 @@ timeout:
 
 functions:
   "fetch source":
-    - command: shell.exec
+    - command: git.get_project
       params:
         directory: mongosql-rs
 
