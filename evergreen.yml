@@ -27,6 +27,21 @@ functions:
       params:
         directory: mongosql-rs
 
+  "generate expansions":
+    - command: shell.exec
+      params:
+        shell: bash
+        working_dir: mongosql-rs
+        script: |
+          cat <<EOT > expansions.yml
+          prepare_shell: |
+            set -o errexit
+            . ~/.cargo/env
+          EOT
+    - command: expansions.update
+      params:
+        file: mongosql-rs/expansions.yml
+
   "install rust toolchain":
     - command: shell.exec
       params:
@@ -66,8 +81,7 @@ functions:
         shell: bash
         working_dir: mongosql-rs
         script: |
-          set -o errexit
-          . ~/.cargo/env
+          ${prepare_shell}
           cargo clippy --all-targets -- -D warnings
 
   "check rustfmt":
@@ -77,8 +91,7 @@ functions:
         shell: bash
         working_dir: mongosql-rs
         script: |
-          set -o errexit
-          . ~/.cargo/env
+          ${prepare_shell}
           rustfmt +nightly --unstable-features --check $(find . -name '*.rs')
 
   "compile release":
@@ -88,8 +101,7 @@ functions:
         shell: bash
         working_dir: mongosql-rs
         script: |
-          set -o errexit
-          . ~/.cargo/env
+          ${prepare_shell}
           cargo build --release
 
   "upload c library":
@@ -105,6 +117,8 @@ functions:
 
 pre:
   - func: "fetch source"
+  - func: "install rust toolchain"
+  - func: "generate expansions"
 
 post: []
 
@@ -112,17 +126,14 @@ tasks:
 
   - name: clippy
     commands:
-      - func: "install rust toolchain"
       - func: "check clippy"
 
   - name: rustfmt
     commands:
-      - func: "install rust toolchain"
       - func: "check rustfmt"
 
   - name: compile
     commands:
-      - func: "install rust toolchain"
       - func: "compile release"
       - func: "upload c library"
 
