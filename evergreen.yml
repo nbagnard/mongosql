@@ -47,6 +47,27 @@ functions:
           . ~/.cargo/env
           rustfmt +nightly --unstable-features --check $(find . -name '*.rs')
 
+  "compile release":
+    - command: shell.exec
+      params:
+        shell: bash
+        working_dir: mongosql-rs
+        script: |
+          set -o errexit
+          . ~/.cargo/env
+          cargo build --release
+
+  "upload c library":
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: mongosql-rs/target/release/libmongosql.a
+        remote_file: mongosql-rs/artifacts/${build_variant}/${task_id}/libmongosql.a
+        bucket: mciuploads
+        permissions: public-read
+        content_type: application/octet-stream
+
 pre:
   - func: "fetch source"
 
@@ -54,18 +75,30 @@ post: []
 
 tasks:
 
-  - name: "clippy"
+  - name: clippy
     commands:
       - func: "check clippy"
 
-  - name: "rustfmt"
+  - name: rustfmt
     commands:
       - func: "check rustfmt"
 
+  - name: compile
+    commands:
+      - func: "compile release"
+      - func: "upload c library"
+
 buildvariants:
-  - name: "static-analysis"
+
+  - name: static-analysis
     display_name: "* Static Analysis"
     run_on: [ ubuntu1804-test ]
     tasks:
-      - name: "clippy"
-      - name: "rustfmt"
+      - name: clippy
+      - name: rustfmt
+
+  - name: ubuntu1804
+    display_name: "Ubuntu 18.04"
+    run_on: [ ubuntu1804-build ]
+    tasks:
+      - name: compile
