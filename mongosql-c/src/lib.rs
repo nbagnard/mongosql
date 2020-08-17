@@ -1,20 +1,23 @@
-use std::{ffi::{CString, CStr}, os::raw};
+use std::{
+    ffi::{CStr, CString},
+    os::raw,
+};
 
 #[no_mangle]
 pub extern "C" fn version() -> *const raw::c_char {
-	to_extern_string("0.1.0-pre-test")
+    to_extern_string("0.1.0-pre-test")
 }
 
 #[no_mangle]
 pub extern "C" fn translate(sql: *const libc::c_char) -> *const raw::c_char {
-	let sql = from_extern_string(sql);
-	let pipeline = mongosql::translate_sql(&sql);
-	to_extern_string(&pipeline)
+    let sql = from_extern_string(sql);
+    let pipeline = mongosql::translate_sql(&sql);
+    to_extern_string(&pipeline)
 }
 
 fn from_extern_string(s: *const libc::c_char) -> String {
-	let s = unsafe { CStr::from_ptr(s).to_bytes() };
-	String::from_utf8(s.to_vec()).unwrap()
+    let s = unsafe { CStr::from_ptr(s).to_bytes() };
+    String::from_utf8(s.to_vec()).unwrap()
 }
 
 fn to_extern_string(s: &str) -> *const raw::c_char {
