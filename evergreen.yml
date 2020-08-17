@@ -45,7 +45,7 @@ functions:
         script: |
           set -o errexit
           . ~/.cargo/env
-          rustfmt +nightly --unstable-features --check src/**/*.rs
+          rustfmt +nightly --unstable-features --check $(find . -name '*.rs')
 
 pre:
   - func: "fetch source"
