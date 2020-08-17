@@ -61,6 +61,7 @@ functions:
 
   "check clippy":
     - command: shell.exec
+      type: test
       params:
         shell: bash
         working_dir: mongosql-rs
@@ -71,6 +72,7 @@ functions:
 
   "check rustfmt":
     - command: shell.exec
+      type: test
       params:
         shell: bash
         working_dir: mongosql-rs
@@ -81,6 +83,7 @@ functions:
 
   "compile release":
     - command: shell.exec
+      type: test
       params:
         shell: bash
         working_dir: mongosql-rs
