@@ -1354,12 +1354,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "deunicode"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "339544cc9e2c4dc3fc7149fd630c5f22263a4fdf18a98afd0075784968b5cf00"
-
-[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1590,16 +1584,6 @@ checksum = "3c3e4e0dd3673c1139bf041f3008816d9cf2946bbfac2945c09e523b8d7b05b2"
 dependencies = [
  "event-listener 5.4.0",
  "pin-project-lite",
-]
-
-[[package]]
-name = "fake"
-version = "2.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d391ba4af7f1d93f01fcf7b2f29e2bc9348e109dfdbf4dcbdc51dfa38dab0b6"
-dependencies = [
- "deunicode",
- "rand",
 ]
 
 [[package]]
@@ -4936,17 +4920,14 @@ dependencies = [
 name = "test-utils"
 version = "0.1.0"
 dependencies = [
- "fake",
  "itertools 0.14.0",
  "lazy_static",
  "mongodb",
  "mongosql",
- "rand",
  "serde",
  "serde_stacker",
  "serde_yaml",
  "thiserror 2.0.11",
- "tokio",
 ]
 
 [[package]]
