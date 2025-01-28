@@ -3,8 +3,6 @@
 This document contains instructions for releasing various components of MongoSQL. At this time, those components are:
 1. `libmongosqltranslate` - used by the ODBC and JDBC drivers for on-prem and direct cluster querying.
 2. `libmongosql` - used by ADF.
-3. `mongodb-schema-manager` - used for on-prem and direct cluster schema management.
-4. `transition-readiness-report` - used to help inform customers what work may be required when moving from BIC to MongoSQL.
 
 ## Versioning
 
@@ -40,33 +38,6 @@ Tags are prepended with `v` for `libmongosql` releases.
 git tag -am v1.6.1 v1.6.1
 ```
 
-### Versioning `mongodb-schema-manager`
-
-`mongodb-schema-manager` uses the following guidelines to determine when each version component will be updated:
-- **major**: backwards-breaking changes to the library API
-- **minor**: new features, including new server version support or new MongoSQL language constructs
-- **patch**: bug fixes
-- **pre-release**: which pre-release version, for use during the on-prem EAP
-
-Tags are prepended with `msm` for `mongodb-schema-manager` releases.
-
-```sh
-git tag -am msm1.0.0-alpha-1 msm1.0.0-alpha-1
-```
-
-### Versioning `transition-readiness-report`
-
-`transition-readiness-report` uses the following guidelines to determine when each version component will be updated:
-- **major**: backwards-breaking changes to the library API
-- **minor**: new features, including new server version support or new MongoSQL language constructs
-- **patch**: bug fixes
-
-Tags are prepended with `trr` for `transition-readiness-report` releases.
-
-```sh
-git tag -am trr1.0.0 trr.0.0
-```
-
 ## Releasing
 
 This section describes the steps for releasing new versions.
@@ -96,11 +67,11 @@ Close the release on JIRA, adding the current date (you may need to ask the SQL 
 
 #### Ensure Evergreen Passing
 
-Ensure that the build you are releasing is passing the tests on the [mongosql-rs waterfall](https://spruce.mongodb.com/commits/mongosql-rs).
+Ensure that the build you are releasing is passing the tests on the [mongosql waterfall](https://spruce.mongodb.com/commits/mongosql).
 
 #### Ensure master up to date
 
-Ensure you have the `master` branch checked out, and that you have pulled the latest commit from `10gen/mongosql-rs`.
+Ensure you have the `main` branch checked out, and that you have pulled the latest commit from `mongodb/mongosql-rs`.
 
 #### Create the tag and push
 
