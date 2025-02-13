@@ -23,7 +23,7 @@ const TYPE_CONSTRAINT_DIR: &str = "../tests/spec_tests/type_constraint_tests";
 const TEST_DB: &str = "test";
 lazy_static! {
     static ref TYPE_TO_SCHEMA: BTreeMap<&'static str, Schema> = map! {
-        "ARRAY" => Schema::Array(Box::new(Schema::Any)),
+        "ARRAY" => Schema::Array(Box::new(Schema::Unsat)),
         "BINDATA" => Schema::Atomic(Atomic::BinData),
         "BOOL" => Schema::Atomic(Atomic::Boolean),
         "BSON_DATE" => Schema::Atomic(Atomic::Date),
@@ -44,6 +44,7 @@ lazy_static! {
         "REGEX" => Schema::Atomic(Atomic::Regex),
         "STRING" => Schema::Atomic(Atomic::String),
         "SYMBOL" => Schema::Atomic(Atomic::Symbol),
+        "UNDEFINED" => Schema::Atomic(Atomic::Undefined),
     };
 }
 
@@ -73,10 +74,10 @@ pub enum Error {
     RewritesFailed(String),
     #[error("rewrite should have failed with error: {0}")]
     RewriteDidNotFail(String),
-    #[error("unexpected algebrize error: {0}")]
-    AlgebrizationFailed(String),
-    #[error("algebrization should have failed, but it didn't")]
-    AlgebrizationDidNotFail,
+    #[error("unexpected algebrize error for test '{0}': {1}")]
+    AlgebrizationFailed(String, String),
+    #[error("algebrization should have failed, but it didn't for test '{0}'")]
+    AlgebrizationDidNotFail(String),
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -246,7 +247,12 @@ pub fn create_catalog(schemas: Vec<Schema>) -> Result<Catalog, Error> {
 ///
 /// This function assumes that [`types[i]`] describes the type of the i`th
 /// argument in the query.
-fn validate_algebrization(types: Vec<String>, ast: Query, is_valid: bool) -> Result<(), Error> {
+fn validate_algebrization(
+    types: Vec<String>,
+    ast: Query,
+    is_valid: bool,
+    test_name: String,
+) -> Result<(), Error> {
     let schemas = types
         .clone()
         .into_iter()
@@ -266,7 +272,7 @@ fn validate_algebrization(types: Vec<String>, ast: Query, is_valid: bool) -> Res
     );
     let plan = algebrizer
         .algebrize_query(ast.clone())
-        .map_err(|e| Error::AlgebrizationFailed(format!("{e:?}")));
+        .map_err(|e| Error::AlgebrizationFailed(test_name.clone(), format!("{e:?}")));
     match plan {
         Ok(_) => {
             if !is_valid {
@@ -274,7 +280,7 @@ fn validate_algebrization(types: Vec<String>, ast: Query, is_valid: bool) -> Res
                 // here
                 dbg!(&types);
                 dbg!(&ast);
-                Err(Error::AlgebrizationDidNotFail)
+                Err(Error::AlgebrizationDidNotFail(test_name))
             } else {
                 Ok(())
             }
@@ -334,7 +340,12 @@ pub fn run_type_constraint_tests() -> Result<(), Error> {
                             .cloned()
                             .collect::<BTreeSet<Vec<String>>>();
                         cross_product.into_iter().try_for_each(|types| {
-                            validate_algebrization(types, ast.clone(), true)
+                            validate_algebrization(
+                                types,
+                                ast.clone(),
+                                true,
+                                test.description.clone(),
+                            )
                         })?;
                     }
                     // Ensure that algebrization fails for all invalid type combinations
@@ -343,7 +354,12 @@ pub fn run_type_constraint_tests() -> Result<(), Error> {
                         .unwrap()
                         .difference(&all_valid_permutations)
                         .try_for_each(|types| {
-                            validate_algebrization(types.clone(), ast.clone(), false)
+                            validate_algebrization(
+                                types.clone(),
+                                ast.clone(),
+                                false,
+                                test.description.clone(),
+                            )
                         })?;
                 }
             }
