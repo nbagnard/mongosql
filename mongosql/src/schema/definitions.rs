@@ -299,7 +299,7 @@ impl ResultSet {
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Default)]
 pub enum Schema {
     Unsat,
     Missing,
@@ -307,6 +307,7 @@ pub enum Schema {
     Array(Box<Schema>),
     Document(Document),
     AnyOf(BTreeSet<Schema>),
+    #[default]
     Any,
 }
 
