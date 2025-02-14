@@ -8,7 +8,7 @@ use crate::{
     set,
 };
 use enum_iterator::IntoEnumIterator;
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 use lazy_static::lazy_static;
 use std::collections::{HashMap, HashSet};
 use std::{
@@ -104,6 +104,17 @@ mod user_schema_error {
 pub struct SchemaEnvironment(BindingTuple<Schema>);
 
 impl SchemaEnvironment {
+    /// Simplifies the SchemaEnvironment by calling Schema::simplify on each
+    /// Schema in the SchemaEnvironment.
+    pub fn simplify(self) -> Self {
+        SchemaEnvironment(
+            self.0
+                .into_iter()
+                .map(|(k, v)| (k, Schema::simplify(&v)))
+                .collect(),
+        )
+    }
+
     /// Takes all Datasource-Schema key-value pairs from a SchemaEnvironment
     /// and adds them to the current SchemaEnvironment, returning the modified
     /// SchemaEnvironment.
@@ -982,6 +993,20 @@ impl Schema {
                         _ => set![x],
                     })
                     .collect();
+                // Merge any document schemata in an AnyOf.
+                let (docs, mut non_doc_schemata): (Vec<_>, BTreeSet<_>) =
+                    ret.into_iter().partition_map(|s| match s {
+                        Schema::Document(d) => Either::Left(d),
+                        _ => Either::Right(s),
+                    });
+                if !docs.is_empty() {
+                    let doc_schema = Schema::Document(
+                        docs.into_iter()
+                            .fold(Document::default(), |acc, s| acc.merge(s)),
+                    );
+                    non_doc_schemata.insert(doc_schema);
+                };
+                let ret = non_doc_schemata;
                 if ret.is_empty() {
                     Unsat
                 } else if ret.contains(&Schema::Any) {
