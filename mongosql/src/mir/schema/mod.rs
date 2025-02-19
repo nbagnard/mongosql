@@ -2062,6 +2062,7 @@ impl CachedSchema for MatchQuery {
             MatchQuery::Regex(s) => &s.cache,
             MatchQuery::ElemMatch(s) => &s.cache,
             MatchQuery::Comparison(s) => &s.cache,
+            MatchQuery::False(f) => &f.cache,
         }
     }
 
