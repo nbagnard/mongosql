@@ -707,8 +707,11 @@ impl StageMovementVisitor<'_> {
                         (_, true) => {
                             side = BubbleUpSide::Right;
                         }
-                        // This case should be impossible, but best to be safe
-                        (false, false) => return (node, false),
+                        // This case is when we have a TRUE or FALSE filter, we want this to bubble
+                        // up both sides.
+                        (false, false) => {
+                            side = BubbleUpSide::Both;
+                        }
                     }
                 }
             }

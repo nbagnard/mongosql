@@ -6250,11 +6250,15 @@ mod from_clause {
     test_algebrize!(
         join_on_one_true,
         method = algebrize_from_clause,
-        expected = Ok(mir::Stage::Join(mir::Join {
-            join_type: JoinType::Inner,
-            left: Box::new(mir_source_foo()),
-            right: Box::new(mir_source_bar()),
-            condition: Some(mir::Expression::Literal(mir::LiteralValue::Boolean(true))),
+        expected = Ok(mir::Stage::Filter(mir::Filter {
+            source: Box::new(mir::Stage::Join(mir::Join {
+                join_type: JoinType::Inner,
+                left: Box::new(mir_source_foo()),
+                right: Box::new(mir_source_bar()),
+                condition: None,
+                cache: SchemaCache::new(),
+            })),
+            condition: mir::Expression::Literal(mir::LiteralValue::Boolean(true)),
             cache: SchemaCache::new(),
         })),
         input = Some(ast::Datasource::Join(JoinSource {
@@ -6549,7 +6553,8 @@ mod from_clause {
     test_algebrize!(
         join_condition_referencing_non_correlated_fields,
         method = algebrize_from_clause,
-        expected = Ok(mir::Stage::Join(mir::Join {
+        expected = Ok(
+            mir::Stage::Join(mir::Join {
             join_type: mir::JoinType::Left,
             left: Box::new(mir::Stage::Project(mir::Project {
                             is_add_fields: false,
@@ -6595,8 +6600,8 @@ mod from_clause {
                         })
                     ],
                     is_nullable: false,
-                }
-            )),
+                })
+            ),
             cache: SchemaCache::new(),
         })),
         input = Some(ast::Datasource::Join(JoinSource {
