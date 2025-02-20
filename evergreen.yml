@@ -826,7 +826,7 @@ functions:
           semgrep --version
           set +e
           timestamp=$(date +'%Y-%m-%dT%H_%M_%S')
-          semgrep --config p/rust --metrics=off --sarif --exclude "benchmark" --verbose --error --severity=ERROR --sarif-output=mongosqltranslate_$timestamp.sast.sarif > mongosqltranslate.sast.cmd.verbose.out 2>&1
+          semgrep --config p/rust --metrics=off --sarif --exclude "benchmark" --verbose --error --severity=ERROR --sarif-output=mongosqltranslate_$timestamp.sast.sarif > mongosqltranslate_$timestamp.sast.cmd.verbose.out 2>&1
           SCAN_RESULT=$?
           set -e
           # Exit with a failure if the scan found an issue
@@ -1240,10 +1240,6 @@ tasks:
     commands:
       - func: "generate memory usage tasks"
 
-  - name: semgrep
-    commands:
-      - func: "generate static code analysis"
-
 buildvariants:
   - name: static-analysis
     display_name: "* Static Analysis"
@@ -1365,8 +1361,3 @@ buildvariants:
     tasks:
       - name: release
 
-  - name: code-security
-    display_name: "Code Security"
-    run_on: [ubuntu2204-small]
-    tasks:
-      - name: semgrep
