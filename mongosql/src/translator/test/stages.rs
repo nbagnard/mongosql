@@ -196,18 +196,18 @@ mod group {
                     expr: ROOT.clone()
                 },],
                 aggregations: vec![
-                    // Count(*) is traslated as Count(1).
+                    // Count(*) is translated as Count(ROOT).
                     air::AccumulatorExpr {
                         alias: "c_distinct".into(),
                         function: air::AggregationFunction::Count,
                         distinct: true,
-                        arg: air::Expression::Literal(air::LiteralValue::Integer(1)).into(),
+                        arg: ROOT.clone().into(),
                     },
                     air::AccumulatorExpr {
                         alias: "c_nondistinct".into(),
                         function: air::AggregationFunction::Count,
                         distinct: false,
-                        arg: air::Expression::Literal(air::LiteralValue::Integer(1)).into(),
+                        arg: ROOT.clone().into(),
                     },
                 ]
             })
@@ -376,7 +376,7 @@ mod group {
                     alias: "__id".into(),
                     function: air::AggregationFunction::Count,
                     distinct: false,
-                    arg: air::Expression::Literal(air::LiteralValue::Integer(1)).into(),
+                    arg: ROOT.clone().into(),
                 },]
             })
             .into(),
@@ -1226,6 +1226,23 @@ mod mql_intrinsic {
                     function: mir::MatchLanguageComparisonOp::Lt,
                     input: Some(util::mir_field_path("f", vec!["a"])),
                     arg: mir::LiteralValue::Integer(1),
+                    cache: mir::schema::SchemaCache::new(),
+                }),
+                cache: mir::schema::SchemaCache::new(),
+            }))
+        );
+
+        test_translate_stage!(
+            false_stage,
+            expected = Ok(air::Stage::Match(air::Match::MatchLanguage(
+                air::MatchLanguage {
+                    source: util::air_project_collection(None, "foo", Some("f")),
+                    expr: Box::new(air::MatchQuery::False),
+                }
+            ))),
+            input = mir::Stage::MQLIntrinsic(mir::MQLStage::MatchFilter(mir::MatchFilter {
+                source: util::mir_project_collection(None, "foo", Some("f"), None),
+                condition: mir::MatchQuery::False(mir::MatchFalse {
                     cache: mir::schema::SchemaCache::new(),
                 }),
                 cache: mir::schema::SchemaCache::new(),

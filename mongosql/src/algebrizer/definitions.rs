@@ -605,13 +605,26 @@ impl<'a> Algebrizer<'a> {
                     cache: SchemaCache::new(),
                 })
             }
-            ast::JoinType::Cross | ast::JoinType::Inner => mir::Stage::Join(mir::Join {
-                join_type: mir::JoinType::Inner,
-                left: Box::new(left_src),
-                right: Box::new(right_src),
-                condition,
-                cache: SchemaCache::new(),
-            }),
+            ast::JoinType::Cross | ast::JoinType::Inner => {
+                let join = mir::Stage::Join(mir::Join {
+                    join_type: mir::JoinType::Inner,
+                    left: Box::new(left_src),
+                    right: Box::new(right_src),
+                    condition: None,
+                    cache: SchemaCache::new(),
+                });
+                // The stage_movement optimization will place this condition in the Join if it makes sense. Otherwise,
+                // it will move it as early in the pipeline as possible.
+                if let Some(condition) = condition {
+                    mir::Stage::Filter(mir::Filter {
+                        source: Box::new(join),
+                        condition,
+                        cache: SchemaCache::new(),
+                    })
+                } else {
+                    join
+                }
+            }
         };
         stage.schema(&self.schema_inference_state())?;
         Ok(stage)
